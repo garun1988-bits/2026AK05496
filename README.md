@@ -1,48 +1,69 @@
-# ML Assignment 2 — Step 1 Starter (UCI Dry Bean)
+# Machine Learning Assignment 2 — Dry Bean Classification
 
-This ZIP contains **Step 1 only**: dataset acquisition, inspection, and reproducible train/test preparation. It does **not** contain trained models, Streamlit app, live URLs, or a BITS Virtual Lab screenshot. Those must be completed in later steps by the student.
+**BITS ID:** 2026AK05496  
+**GitHub repository:** https://github.com/garun1988-bits/2026AK05496  
+**Live Streamlit application:** https://2026ak05496-mshxsbm9walbkck4o6hbwt.streamlit.app/
 
-## Assignment requirements
-- One UCI/Kaggle classification dataset, >=500 instances and >=12 input features.
-- Train Logistic Regression, Decision Tree, KNN, Gaussian/Multinomial Naive Bayes, and SVM on the same dataset.
-- Report Accuracy, AUC, Precision, Recall, F1 and MCC for each.
-- Save models, create interactive Streamlit app for CSV test upload, model selection, metrics and confusion matrix/classification report. Evaluate uploaded test data without retraining.
-- Submit one PDF in order: GitHub URL, live Streamlit URL, screenshot of execution on BITS Virtual Lab, README content.
-- Follow academic integrity guidance; AI is for learning support, not direct copy/paste submission.
+## Problem statement
 
-## Dataset
-UCI Dry Bean (dataset ID 602): https://archive.ics.uci.edu/dataset/602/dry+bean+dataset
-13,611 instances, 16 numeric input features, 7 classes. Cite the dataset source and authors in the final README/report. Download requires internet access from BITS Virtual Lab; if restricted, download on an allowed machine and transfer the original CSV to `data/dry_bean.csv`.
+Classify dry bean samples into seven bean varieties using sixteen numeric measurements derived from bean images. Compare five supervised classification algorithms on the same held-out test set using Accuracy, AUC, Precision, Recall, F1, and Matthews Correlation Coefficient (MCC). Deploy the saved classifiers in a Streamlit application that accepts a labelled CSV for evaluation without retraining.
 
-## BITS Virtual Lab setup (Linux terminal)
+## Dataset description
+
+**Source:** UCI Machine Learning Repository — Dry Bean Dataset (dataset 602): https://archive.ics.uci.edu/dataset/602/dry+bean+dataset
+
+The source dataset has **13,611 records**, **16 numerical input features**, and **7 target classes**. After removing **68 duplicate records**, **13,543** samples remained. A stratified 80/20 split yielded **10,834 training rows** and **2,709 test rows**. The target column is `Class`. The same test set was used for all five classifiers.
+
+The 16 input features are Area, Perimeter, MajorAxisLength, MinorAxisLength, AspectRation, Eccentricity, ConvexArea, EquivDiameter, Extent, Solidity, Roundness, Compactness, ShapeFactor1, ShapeFactor2, ShapeFactor3, and ShapeFactor4.
+
+## Project files
+
+- `app.py` — Streamlit application for selecting a saved classifier and evaluating a labelled CSV.
+- `requirements.txt` — Python dependencies.
+- `test_data.csv` — held-out labelled test data.
+- `data/dry_bean.csv` — source dataset; `data/train_data.csv` — training split.
+- `model/` — five saved classifier artifacts (`.joblib`).
+- `train_models.py`, `evaluate_models.py`, `prepare_data.py`, `inspect_dataset.py`, `download_dataset.py` — dataset preparation, training and evaluation scripts.
+- `results/` — model comparison, confusion matrices and classification reports.
+- `screenshots/` — genuine BITS Virtual Lab application screenshots.
+
+## Running the application
+
+From the project root, install dependencies and launch the app:
+
 ```bash
-cd ml_assignment_2_step1
-python3 --version
-python3 -m venv .venv
-source .venv/bin/activate
 python -m pip install -r requirements.txt
-python download_dataset.py
-python inspect_dataset.py
-python prepare_data.py
+streamlit run app.py
 ```
-For Windows, activate with `.venv\\Scripts\\activate` and use `python` as appropriate. If venv or network is blocked, use your lab's approved environment.
 
-## Generated files
-- `data/dry_bean.csv`: full downloaded data
-- `data/train_data.csv`: deduplicated stratified 80% training partition
-- `test_data.csv`: deduplicated stratified 20% test partition, including target `Class`
+Choose one of the five saved models, upload `test_data.csv` (including the `Class` target), and inspect the six metrics and confusion matrix. The application loads saved models; it does not retrain them on uploaded data. The public deployment is linked above.
 
-Exact counts after deduplication can differ from the original 13,611. The fixed `random_state=42` makes the split reproducible. Step 2 must train **only** on `data/train_data.csv`, then evaluate on `test_data.csv`. Preprocessing parameters (e.g. scaling) must be fit on training data only and saved with each classifier, ideally as a scikit-learn Pipeline.
+## Model comparison — held-out test set (2,709 rows)
 
-## Lab screenshot
-Take a genuine screenshot of successful execution inside BITS Virtual Lab. Place it in `screenshots/` for your final submission. No screenshot is included in this starter.
+| Model | Accuracy | AUC | Precision | Recall | F1 | MCC |
+|---|---:|---:|---:|---:|---:|---:|
+| Logistic Regression | 0.9195 | 0.9935 | 0.9201 | 0.9195 | 0.9197 | 0.9028 |
+| Decision Tree | 0.8955 | 0.9357 | 0.8954 | 0.8955 | 0.8953 | 0.8737 |
+| K-Nearest Neighbors | 0.9155 | 0.9811 | 0.9163 | 0.9155 | 0.9157 | 0.8978 |
+| Gaussian Naive Bayes | 0.7630 | 0.9644 | 0.7647 | 0.7630 | 0.7607 | 0.7143 |
+| Support Vector Machine | 0.9210 | 0.9933 | 0.9214 | 0.9210 | 0.9211 | 0.9045 |
 
-## Step 1 checklist
-- [ ] Dataset downloaded and source cited
-- [ ] Python environment verified on BITS Virtual Lab
-- [ ] Missing values, duplicates and class balance inspected
-- [ ] Stratified split generated
-- [ ] Lab screenshot captured
+The reported values are rounded to four decimal places. Accuracy and recall coincide here because recall is calculated using weighted averaging in this multiclass setting.
 
-## Academic integrity
-Review, run, understand, adapt and document your own implementation. Do not submit this starter unmodified as your own work.
+## Observations and interpretation
+
+1. **Logistic Regression:** Accuracy 0.9195, F1 0.9197 and MCC 0.9028. Its AUC of 0.9935 is the highest of the five models, indicating strong class-discrimination performance under the reported multiclass AUC calculation.
+2. **Decision Tree:** Accuracy 0.8955 and MCC 0.8737. It is interpretable but trails Logistic Regression, KNN and SVM on the held-out set; its AUC of 0.9357 is also lower.
+3. **K-Nearest Neighbors:** Accuracy 0.9155 and F1 0.9157. Its results are close to Logistic Regression and SVM, with an AUC of 0.9811.
+4. **Gaussian Naive Bayes:** Accuracy 0.7630, F1 0.7607 and MCC 0.7143. This is the weakest model on accuracy and F1, despite its AUC of 0.9644. The feature-independence assumption may limit classification performance; this is an interpretation, not a proven causal explanation.
+5. **Support Vector Machine:** Accuracy 0.9210, F1 0.9211 and MCC 0.9045, the highest values among the evaluated models. Its AUC of 0.9933 is slightly below Logistic Regression.
+
+**Overall conclusion:** Support Vector Machine is the best overall model on this test set based on Accuracy, F1 and MCC. Logistic Regression leads marginally on AUC. These conclusions apply to this dataset, split and reported evaluation settings; they do not establish superiority on every possible dataset.
+
+## Evidence and reproducibility
+
+Five screenshots taken inside the BITS Virtual Lab on 9 November 2026 show the local Streamlit application at `127.0.0.1:8501` evaluating the same 2,709-row labelled test CSV using each saved classifier, with six metrics and a confusion matrix. The GitHub repository contains the code, saved models, test data and evaluation results. The public Streamlit URL is provided above.
+
+## Dataset acknowledgement and academic integrity
+
+Dataset: *Dry Bean Dataset*, UCI Machine Learning Repository, dataset 602, https://doi.org/10.24432/C50S4B. Dataset authors: Murat Koklu and Ilker Ali Ozkan. Review and verify the scripts, evaluation choices, and explanations before submission; this README describes the reported project results and is not a substitute for understanding the implementation.
