@@ -1,0 +1,6 @@
+# Run inside the existing project root after copying the Step 3 .py files:
+cd ~/Downloads/ml_assignment_2_step1
+python3 -m pip install streamlit matplotlib
+python3 validate_streamlit_results.py
+python3 -m streamlit run app.py --server.address 127.0.0.1
+# Open the printed URL in the BITS Virtual Lab browser; upload test_data.csv.

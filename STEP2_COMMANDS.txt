@@ -1,0 +1,5 @@
+# Run from existing Step 1 project root after copying the three .py files there:
+python3 -c "import pandas, sklearn, joblib; print('Dependencies OK')"
+python3 train_models.py
+python3 check_saved_models.py
+ls -lh model/ results/
